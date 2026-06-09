@@ -107,7 +107,7 @@ export default function PageLanding({ onNext }) {
               <h3 className="text-[22px] font-bold text-[#35a95b] leading-[1.1] mb-1">
                 From learner to standout candidate
               </h3>
-              <p className="text-[#64c982] text-sm font-semibold">Text</p>
+              <p className="text-[#64c982] text-sm font-semibold">APC-10</p>
             </div>
             
             <button className="bg-[#fbb117] hover:bg-[#e8a315] text-white font-bold py-3 px-4 rounded-2xl shadow-lg transition-transform hover:scale-105 text-xs text-center flex-shrink-0">
