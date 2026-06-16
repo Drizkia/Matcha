@@ -20,19 +20,16 @@ import ChatBot from './ChatBot';
 export default function PageCareerPath({ onNavigate, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // <DATA DARI BACKEND: ATS MATCH & TRACKS>
+  // <ATS>
   const atsMatchRate = 0; 
   const careerTracksCount = 0;
-  // </DATA DARI BACKEND>
 
-  // <DATA DARI BACKEND: SKILLS>
+  // <SKILLS>
   const skillsHave = [];
   const skillsNeed = [];
-  // </DATA DARI BACKEND>
 
-  // <DATA DARI BACKEND: ROADMAP>
+  // <ROADMAP>
   const roadmapData = [];
-  // </DATA DARI BACKEND>
 
   const navItems = [
     { key: 'dashboard', icon: <LayoutDashboard className="w-4 h-4" />, label: 'Dashboard' },
@@ -44,8 +41,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
 
   return (
     <div className="min-h-screen bg-[#c8f0d5] font-sans flex flex-col md:flex-row md:p-4 md:gap-4">
-
-      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between bg-[#f8f5eb] px-4 py-3 border-b border-white/50 shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md">
@@ -61,7 +56,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#f8f5eb] border-b border-white/50 px-4 py-3 flex flex-col gap-1 z-20 shadow-md">
           {navItems.map(item => (
@@ -81,7 +75,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
         </div>
       )}
 
-      {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-56 lg:w-64 bg-[#f8f5eb] rounded-3xl p-5 lg:p-6 flex-col shadow-sm border border-white/50 relative z-10 flex-shrink-0">
         <div className="flex items-center gap-3 mb-8 pl-2">
           <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -111,7 +104,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
           </button>
         </nav>
 
-        {/* AI Coach Mini Card */}
         <div className="mt-4 mb-4 bg-white/60 p-3 rounded-2xl flex items-center gap-3 border border-white">
            <div className="w-8 h-8 bg-[#e5f8ec] rounded-lg flex items-center justify-center text-[#35a95b]">
               <Sprout className="w-4 h-4" />
@@ -132,10 +124,8 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 rounded-none md:rounded-3xl p-4 sm:p-6 lg:p-8 relative overflow-y-auto pb-24 md:pb-8">
         
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 gap-3 relative z-10">
           <div>
             <h4 className="text-[#35a95b] font-bold tracking-[0.15em] text-[10px] uppercase mb-1">Matcha Jalur Karier</h4>
@@ -146,10 +136,8 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
           </div>
         </div>
 
-        {/* Container 1: Stats */}
         <div className="bg-[#fcfbfa] rounded-[2rem] p-5 sm:p-6 shadow-sm border border-white/50 mb-6 flex flex-col sm:flex-row items-center gap-5">
           
-          {/* Circular Progress */}
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center flex-shrink-0">
              <div className="absolute inset-0 rounded-full border-8 border-green-100"></div>
              <div className="absolute inset-0 rounded-full border-8 border-[#35a95b] border-t-transparent border-l-transparent rotate-45"></div>
@@ -160,7 +148,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
              </div>
           </div>
 
-          {/* Stat Badges */}
           <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
              <div className="bg-[#e4f7eb] px-4 py-2.5 rounded-full flex items-center gap-2 border border-white shadow-sm">
                 <Gauge className="w-4 h-4 text-[#35a95b]" />
@@ -169,14 +156,12 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
           </div>
         </div>
 
-        {/* Container 2: Skill Gap Tracker */}
         <div className="bg-[#fcfbfa] rounded-[2rem] p-5 sm:p-6 shadow-sm border border-white/50 mb-6">
            <h3 className="flex items-center gap-2 font-bold text-gray-800 text-sm mb-5">
              <Gauge className="w-4 h-4 text-[#35a95b]" /> Pelacak Kesenjangan Skill
            </h3>
            
            <div className="space-y-4">
-             {/* Skills You Have */}
              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
                 <h4 className="text-[10px] font-bold text-[#35a95b] tracking-widest uppercase mb-3 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#35a95b]"></span> Skill yang Kamu Miliki
@@ -190,7 +175,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
                 </div>
              </div>
 
-             {/* Skills You Need */}
              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
                 <h4 className="text-[10px] font-bold text-[#f8aa18] tracking-widest uppercase mb-3 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#f8aa18]"></span> Skill yang Perlu Dikembangkan
@@ -206,7 +190,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
            </div>
         </div>
 
-        {/* Container 3: Learning Roadmap */}
         <div className="bg-[#fcfbfa] rounded-[2rem] p-5 sm:p-6 shadow-sm border border-white/50">
            <h3 className="flex items-center gap-2 font-bold text-gray-800 text-sm mb-6">
              <BookOpen className="w-4 h-4 text-[#35a95b]" /> Peta Jalan Belajar
@@ -223,12 +206,10 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
                
                {roadmapData.map((item) => (
                  <div key={item.id} className="relative flex items-center group">
-                   {/* Timeline dot */}
                    <div className="absolute left-0 -ml-[27px] w-4 h-4 rounded-full border-2 border-white shadow-sm flex items-center justify-center bg-[#35a95b]">
                       <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                    </div>
 
-                   {/* Card */}
                    <button 
                      onClick={() => onNavigate('resource', item.title)}
                      className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm w-full relative hover:shadow-md transition-shadow text-left focus:outline-none focus:ring-2 focus:ring-[#8ccf32] group-hover:-translate-y-1 duration-200"
@@ -245,7 +226,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
                           </span>
                         </div>
                         
-                        {/* Progress Bar Mini */}
                         <div className="text-right w-full sm:w-24">
                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mb-1">
                              <div className={`h-full ${
@@ -268,7 +248,6 @@ export default function PageCareerPath({ onNavigate, onLogout }) {
 
       </main>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5eb] border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30 flex items-center justify-around px-2 py-2">
         {navItems.map(item => (
           <button key={item.key} onClick={() => onNavigate(item.key)}

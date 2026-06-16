@@ -13,10 +13,7 @@ import {
 export default function PageLanding({ onNext }) {
   return (
     <div className="min-h-screen bg-[#d2f3db] flex items-center justify-center p-4 md:p-8 font-sans">
-      {/* Main Container */}
       <div className="w-full max-w-[500px] bg-gradient-to-b from-[#e5f8ec] to-[#d7f5e1] rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden border border-white/60 p-5 sm:p-6 md:p-8 relative">
-        
-        {/* Top Header */}
         <div className="flex flex-col items-center gap-2 mb-5">
           <div className="flex items-center gap-3 w-full justify-start">
             <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -29,7 +26,6 @@ export default function PageLanding({ onNext }) {
           </div>
         </div>
 
-        {/* Top Pills */}
         <div className="flex justify-between items-center mb-6 gap-2">
           <div className="bg-[#eaf9ee] px-3 sm:px-4 py-2 rounded-full text-[#45b76f] font-medium text-[10px] sm:text-[11px] shadow-sm border border-white flex-1 text-center truncate">
             Momentum karier, dibangun setiap hari
@@ -39,24 +35,18 @@ export default function PageLanding({ onNext }) {
           </div>
         </div>
 
-        {/* Center Graphic */}
         <div className="relative h-56 sm:h-72 mb-6 flex items-center justify-center w-full">
-          {/* Glowing background */}
           <div className="absolute w-48 sm:w-56 h-48 sm:h-56 bg-white/70 rounded-full blur-2xl"></div>
           
           <div className="relative w-full max-w-[320px] h-full flex items-center justify-center">
-             
-             {/* Center Interactive Button */}
              <button 
                onClick={onNext}
                className="relative z-20 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-[1.25rem] flex items-center justify-center shadow-[0_0_40px_rgba(140,207,50,0.6)] hover:scale-105 transition-all duration-300 cursor-pointer group"
              >
                <Briefcase className="text-white w-7 h-7 sm:w-8 sm:h-8 group-hover:rotate-12 transition-transform" />
-               {/* Pulsing ring */}
                <span className="absolute w-full h-full rounded-[1.25rem] border-2 border-[#8ccf32] animate-ping opacity-60"></span>
              </button>
 
-             {/* Surrounding blocks */}
              <div className="absolute top-[10%] left-[10%] w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#68c946] to-[#aee449] rounded-2xl shadow-sm opacity-90"></div>
              
              <div className="absolute top-[15%] left-[25%] bg-white/80 backdrop-blur-sm px-2 sm:px-3 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-semibold text-gray-400 flex items-center gap-1 sm:gap-1.5 shadow-[0_4px_10px_rgba(0,0,0,0.03)] border border-white/60 z-10">
@@ -90,7 +80,6 @@ export default function PageLanding({ onNext }) {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className="mt-2 bg-gradient-to-b from-white/40 to-white/20 backdrop-blur-md rounded-3xl p-4 sm:p-5 border border-white/50 shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <div className="max-w-[65%]">

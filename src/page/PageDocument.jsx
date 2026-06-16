@@ -20,7 +20,7 @@ import { deleteDocument } from '../services/api';
 export default function PageDocument({ onNavigate, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // <DATA DARI BACKEND: STATS & FILES>
+  // <STATS & FILES>
   const stats = {
     totalFiles: 0,
     lastUpdated: "-",
@@ -28,13 +28,11 @@ export default function PageDocument({ onNavigate, onLogout }) {
   };
 
   const [files, setFiles] = useState([]);
-  // </DATA DARI BACKEND>
 
   const handleDelete = async (fileId, fileType) => {
     if (!window.confirm("Apakah kamu yakin ingin menghapus dokumen ini?")) return;
     
     try {
-      // Kita pakai session_id sementara: 'demo-session'
       await deleteDocument({
         session_id: 'demo-session',
         file_type: fileType
@@ -59,7 +57,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
   return (
     <div className="min-h-screen bg-[#c8f0d5] font-sans flex flex-col md:flex-row md:p-4 md:gap-4">
 
-      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between bg-[#f8f5eb] px-4 py-3 border-b border-white/50 shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md">
@@ -75,7 +72,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#f8f5eb] border-b border-white/50 px-4 py-3 flex flex-col gap-1 z-20 shadow-md">
           {navItems.map(item => (
@@ -95,7 +91,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
         </div>
       )}
 
-      {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-56 lg:w-64 bg-[#f8f5eb] rounded-3xl p-5 lg:p-6 flex-col shadow-sm border border-white/50 relative z-10 flex-shrink-0">
         <div className="flex items-center gap-3 mb-8 pl-2">
           <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -125,7 +120,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
           </button>
         </nav>
 
-        {/* Mini Card */}
         <div className="mt-4 mb-4 bg-white/60 p-4 rounded-2xl border border-white">
            <h4 className="text-[10px] font-bold text-[#35a95b] tracking-widest uppercase mb-1">Brankas</h4>
            <p className="text-gray-500 text-[11px] leading-relaxed">Kelola dokumen kariermu dengan aman.</p>
@@ -141,16 +135,12 @@ export default function PageDocument({ onNavigate, onLogout }) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 bg-[#f8f5eb] rounded-none md:rounded-3xl p-4 sm:p-6 lg:p-10 relative overflow-y-auto pb-24 md:pb-10 shadow-sm border-0 md:border border-white/50">
-        
-        {/* Header */}
         <div className="mb-6 sm:mb-8 relative z-10">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">Brankas Dokumen</h1>
           <p className="text-gray-500 text-sm">Kelola dokumen karier yang diunggah dengan aman.</p>
         </div>
 
-        {/* Stats Bar */}
         <div className="bg-[#fcfbfa] rounded-2xl p-4 shadow-sm border border-white/50 flex flex-wrap gap-3 mb-8 sm:mb-10">
           <div className="bg-[#e4f7eb] px-4 py-2 rounded-full flex items-center gap-2 border border-white shadow-sm">
              <span className="w-1.5 h-1.5 rounded-full bg-[#35a95b]"></span>
@@ -166,7 +156,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
           </div>
         </div>
 
-        {/* Files Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
            {files.map(file => (
              <div key={file.id} className="bg-[#fcfbfa] rounded-[2rem] p-6 sm:p-8 shadow-sm border-2 border-dashed border-[#8ccf32] flex flex-col items-center text-center hover:bg-white transition-colors group">
@@ -191,7 +180,6 @@ export default function PageDocument({ onNavigate, onLogout }) {
 
       </main>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5eb] border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30 flex items-center justify-around px-2 py-2">
         {navItems.map(item => (
           <button key={item.key} onClick={() => onNavigate(item.key)}

@@ -17,16 +17,14 @@ import {
 import ChatBot from './ChatBot';
 
 export default function PageResource({ onNavigate, onLogout, initialTopic = '' }) {
-  // <DATA DARI BACKEND: FILTER CATEGORIES>
+  // <FILTER CATEGORIES>
   const categories = ["Semua", "Coursera", "Udemy", "YouTube", "Gratis", "Rekomendasi"];
-  // </DATA DARI BACKEND>
 
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // <DATA DARI BACKEND: COURSE CATALOG>
+  // <COURSE CATALOG>
   const coursesData = [];
-  // </DATA DARI BACKEND>
 
   const [searchQuery, setSearchQuery] = useState(initialTopic);
 
@@ -49,7 +47,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
   return (
     <div className="min-h-screen bg-[#c8f0d5] font-sans flex flex-col md:flex-row md:p-4 md:gap-4">
 
-      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between bg-[#f8f5eb] px-4 py-3 border-b border-white/50 shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md">
@@ -65,7 +62,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#f8f5eb] border-b border-white/50 px-4 py-3 flex flex-col gap-1 z-20 shadow-md">
           {navItems.map(item => (
@@ -85,7 +81,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
         </div>
       )}
 
-      {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-56 lg:w-64 bg-[#f8f5eb] rounded-3xl p-5 lg:p-6 flex-col shadow-sm border border-white/50 relative z-10 flex-shrink-0">
         <div className="flex items-center gap-3 mb-8 pl-2">
           <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -115,7 +110,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
           </button>
         </nav>
 
-        {/* AI Guide Mini Card */}
         <div className="mt-4 mb-4 bg-white/60 p-3 rounded-2xl flex items-center gap-3 border border-white">
            <div className="w-8 h-8 bg-[#e5f8ec] rounded-lg flex items-center justify-center text-[#35a95b]">
               <Sprout className="w-4 h-4" />
@@ -136,10 +130,8 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 rounded-none md:rounded-3xl p-4 sm:p-6 lg:p-8 relative overflow-y-auto pb-24 md:pb-8">
         
-        {/* Header and Search */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 gap-3 relative z-10">
           <div>
             <div className="inline-flex items-center gap-1.5 bg-white/60 px-3 py-1.5 rounded-full text-[#35a95b] text-[10px] font-bold tracking-widest uppercase mb-3 shadow-sm border border-white/50">
@@ -164,7 +156,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
           </div>
         </div>
 
-        {/* Filter Categories */}
         <div className="bg-[#fcfbfa] rounded-full p-1.5 shadow-sm border border-white/50 mb-6 flex overflow-x-auto gap-1">
            {categories.map((cat, idx) => (
              <button 
@@ -181,19 +172,16 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
            ))}
         </div>
 
-        {/* Course Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
            {filteredCourses.map(course => (
              <div key={course.id} className="bg-[#fcfbfa] rounded-[2rem] overflow-hidden shadow-sm border border-white/50 flex flex-col hover:shadow-md transition-shadow group">
                 
-                {/* Top Color */}
                 <div className={`h-28 sm:h-32 ${course.colorCode} relative p-4 opacity-80 group-hover:opacity-100 transition-opacity`}>
                    <span className="bg-white/70 backdrop-blur-md text-gray-800 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">
                      {course.platform}
                    </span>
                 </div>
 
-                {/* Content */}
                 <div className="p-5 sm:p-6 flex-1 flex flex-col bg-white">
                    <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 leading-tight">
                      {course.title}
@@ -221,7 +209,6 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
 
       </main>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5eb] border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30 flex items-center justify-around px-2 py-2">
         {navItems.map(item => (
           <button key={item.key} onClick={() => onNavigate(item.key)}

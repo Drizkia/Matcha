@@ -34,9 +34,7 @@ async function requestForm(endpoint, formData) {
   return response.json();
 }
 
-// ============================================================
-// ENDPOINTS BERDASARKAN SWAGGER UI
-// ============================================================
+// ENDPOINTS
 
 /** 
  * POST /chat — Chat dengan AI

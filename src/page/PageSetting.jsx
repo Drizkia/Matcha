@@ -22,14 +22,13 @@ import {
 import ChatBot from './ChatBot';
 
 export default function PageSetting({ onNavigate, onLogout }) {
-  // <DATA DARI BACKEND: USER PROFILE>
+  // <USER PROFILE>
   const [profile, setProfile] = useState({
     fullName: "",
     educationalBackground: "",
     targetCareerGoal: "",
     weeklyStudyTime: ""
   });
-  // </DATA DARI BACKEND>
 
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -42,20 +41,18 @@ export default function PageSetting({ onNavigate, onLogout }) {
 
   const handleSave = () => {
     setIsSaving(true);
-    // <KIRIM KE BACKEND: PATCH /users/me>
+    // <PATCH /users/me>
     setTimeout(() => {
       setIsSaving(false);
       setSaved(true);
     }, 1000);
-    // </KIRIM KE BACKEND>
   };
 
   const handleReset = () => {
     if (window.confirm("Apakah kamu yakin? Tindakan ini akan menghapus permanen peta jalan, data skill, dan dokumenmu.")) {
-      // <KIRIM KE BACKEND: POST /users/me/reset>
+      // <POST /users/me/reset>
       alert("Semua layanan direset. Kamu akan keluar dari aplikasi.");
       onLogout();
-      // </KIRIM KE BACKEND>
     }
   };
 
@@ -70,7 +67,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
   return (
     <div className="min-h-screen bg-[#c8f0d5] font-sans flex flex-col md:flex-row md:p-4 md:gap-4">
 
-      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between bg-[#f8f5eb] px-4 py-3 border-b border-white/50 shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md">
@@ -86,7 +82,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#f8f5eb] border-b border-white/50 px-4 py-3 flex flex-col gap-1 z-20 shadow-md">
           {navItems.map(item => (
@@ -106,7 +101,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
         </div>
       )}
 
-      {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-56 lg:w-64 bg-[#f8f5eb] rounded-3xl p-5 lg:p-6 flex-col shadow-sm border border-white/50 relative z-10 flex-shrink-0">
         <div className="flex items-center gap-3 mb-8 pl-2">
           <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
@@ -156,23 +150,19 @@ export default function PageSetting({ onNavigate, onLogout }) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 rounded-none md:rounded-3xl p-4 sm:p-6 lg:p-10 relative overflow-y-auto pb-24 md:pb-10 space-y-5 sm:space-y-6">
         
-        {/* Header */}
         <div className="mb-2 relative z-10">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-1">Pengaturan</h1>
           <p className="text-gray-500 text-sm">Perbarui profil dan preferensimu.</p>
         </div>
 
-        {/* Container 1: Profile & Goals */}
         <div className="bg-[#fcfbfa] rounded-[2rem] p-6 sm:p-8 shadow-sm border border-white/50">
           <h2 className="flex items-center gap-2 font-extrabold text-gray-900 text-lg mb-6 sm:mb-8">
             <Pencil className="w-5 h-5 text-[#35a95b]" /> Profil &amp; Tujuan
           </h2>
 
           <div className="space-y-4 sm:space-y-5">
-            {/* Nama Lengkap */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-2">Nama Lengkap</label>
               <div className="relative">
@@ -187,7 +177,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* Latar Belakang Pendidikan */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-2">Latar Belakang Pendidikan / Jurusan</label>
               <div className="relative">
@@ -202,7 +191,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* Target Karier */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-2">Target Karier / Pekerjaan Impian</label>
               <div className="relative">
@@ -217,7 +205,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* Waktu Belajar Mingguan */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-2">Waktu Belajar Mingguan</label>
               <div className="relative">
@@ -232,7 +219,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
               </div>
             </div>
 
-            {/* Save Button */}
             <button 
               onClick={handleSave}
               disabled={isSaving}
@@ -253,7 +239,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
           </div>
         </div>
 
-        {/* Container 2: Danger Zone */}
         <div className="bg-[#fff5f5] rounded-[2rem] p-6 sm:p-8 shadow-sm border border-red-100">
           <h2 className="flex items-center gap-2 font-extrabold text-red-600 text-lg mb-3">
             <AlertTriangle className="w-5 h-5" /> Zona Berbahaya
@@ -271,7 +256,6 @@ export default function PageSetting({ onNavigate, onLogout }) {
 
       </main>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5eb] border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30 flex items-center justify-around px-2 py-2">
         {navItems.map(item => (
           <button key={item.key} onClick={() => onNavigate(item.key)}

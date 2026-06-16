@@ -25,7 +25,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
   const [userName, setUserName] = useState("John Doe");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // State form upload
   const [cvFile, setCvFile] = useState(null);
   const [linkedinFile, setLinkedinFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
@@ -82,8 +81,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
 
   return (
     <div className="min-h-screen bg-[#c8f0d5] font-sans flex flex-col md:flex-row md:p-4 md:gap-4">
-      
-      {/* Mobile Top Bar */}
       <div className="md:hidden flex items-center justify-between bg-[#f8f5eb] px-4 py-3 border-b border-white/50 shadow-sm sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md">
@@ -99,7 +96,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#f8f5eb] border-b border-white/50 px-4 py-3 flex flex-col gap-1 z-20 shadow-md">
           {navItems.map(item => (
@@ -124,9 +120,7 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         </div>
       )}
 
-      {/* Sidebar - Desktop Only */}
       <aside className="hidden md:flex w-56 lg:w-64 bg-[#f8f5eb] rounded-3xl p-5 lg:p-6 flex-col shadow-sm border border-white/50 relative z-10 flex-shrink-0">
-        {/* Logo */}
         <div className="flex items-center gap-3 mb-8 pl-2">
           <div className="w-10 h-10 bg-[#8ccf32] rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
             <Sprout className="text-white w-5 h-5" />
@@ -137,7 +131,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 space-y-2">
           <button onClick={() => onNavigate('dashboard')} className="w-full flex items-center gap-3 bg-[#e5f8ec] text-[#35a95b] px-4 py-3 rounded-xl font-bold text-sm transition-colors">
             <LayoutDashboard className="w-4 h-4" /> Dashboard
@@ -156,7 +149,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
           </button>
         </nav>
 
-        {/* Bottom Actions */}
         <div className="flex gap-2 mt-auto">
           <button className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-600 px-3 py-2.5 rounded-xl font-semibold text-xs shadow-sm hover:bg-gray-50 transition">
             <HelpCircle className="w-3.5 h-3.5" /> Bantuan
@@ -167,13 +159,8 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 bg-[#e4f7eb] rounded-none md:rounded-3xl p-4 sm:p-6 lg:p-8 relative overflow-hidden shadow-sm border-0 md:border border-white/30 pb-24 md:pb-8">
-        
-        {/* Background Blur */}
         <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-white/40 rounded-full blur-[80px] pointer-events-none"></div>
-
-        {/* Header */}
         <div className="relative z-10 mb-6">
           <div className="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full text-[#35a95b] text-[10px] font-bold tracking-widest uppercase mb-3 shadow-sm border border-white">
             <Sparkles className="w-3 h-3" /> Hub Utama
@@ -182,13 +169,8 @@ export default function PageDashboard({ onNavigate, onLogout }) {
           <p className="text-gray-500 text-sm">Unggah dokumenmu dan tentukan target peran untuk memulai perjalanan kariermu.</p>
         </div>
 
-        {/* Grid Layout */}
         <div className="relative z-10 flex flex-col lg:flex-row gap-5">
-          
-          {/* Left Column (Uploads) */}
           <div className="flex-1 space-y-5">
-            
-            {/* CV Upload */}
             <div className="bg-[#fcfbfa] rounded-[2rem] p-5 shadow-sm border border-white/50">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-gray-800 text-sm">Unggah CV / Resume</h3>
@@ -208,7 +190,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
               </label>
             </div>
 
-            {/* LinkedIn Upload */}
             <div className="bg-[#fcfbfa] rounded-[2rem] p-5 shadow-sm border border-white/50">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-gray-800 text-sm">Unggah PDF Profil LinkedIn</h3>
@@ -230,10 +211,7 @@ export default function PageDashboard({ onNavigate, onLogout }) {
 
           </div>
 
-          {/* Right Column */}
           <div className="flex-1 flex flex-col gap-5">
-            
-            {/* Target Job Requirement */}
             <div className="bg-[#fcfbfa] rounded-[2rem] p-5 shadow-sm border border-white/50 flex-1 flex flex-col min-h-[200px]">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-gray-800 text-sm">Persyaratan Pekerjaan</h3>
@@ -249,7 +227,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
               ></textarea>
             </div>
 
-            {/* Action Box */}
             <div className="bg-[#fff9ea] rounded-[2rem] p-5 border border-[#fde8af] shadow-sm relative overflow-hidden">
               <div className="flex items-start gap-3 mb-5 relative z-10">
                 <div className="mt-0.5 w-8 h-8 bg-[#8ccf32] rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
@@ -289,7 +266,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#f8f5eb] border-t border-white/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] z-30 flex items-center justify-around px-2 py-2">
         {navItems.map(item => (
           <button
@@ -305,7 +281,6 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         ))}
       </nav>
 
-      {/* Floating Chatbot */}
       <ChatBot />
 
     </div>

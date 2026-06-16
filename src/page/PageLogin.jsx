@@ -14,14 +14,11 @@ import {
 export default function PageLogin({ onNext }) {
   return (
     <div className="min-h-screen bg-[#d2f3db] flex items-center justify-center p-4 md:p-8 font-sans">
-      
-      {/* Background decorations */}
       <div className="fixed top-[10%] left-[10%] w-48 sm:w-64 h-48 sm:h-64 bg-[#aee449] rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
       <div className="fixed bottom-[10%] right-[10%] w-48 sm:w-64 h-48 sm:h-64 bg-[#f8aa18] rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
 
       <div className="w-full max-w-[480px] bg-[#fcfbfa] rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden p-5 sm:p-6 md:p-8 relative z-10">
         
-        {/* Header badges */}
         <div className="flex justify-between items-center mb-5">
           <div className="border border-green-200 bg-white px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
             <Sprout className="w-3.5 h-3.5 text-[#35a95b]" />
@@ -32,7 +29,6 @@ export default function PageLogin({ onNext }) {
           </div>
         </div>
 
-        {/* Title and subtitle */}
         <div className="mb-5">
           <h1 className="text-xl sm:text-2xl md:text-[28px] font-bold text-gray-900 mb-2 leading-tight">
             Mulai Perjalanan Kariermu
@@ -42,9 +38,7 @@ export default function PageLogin({ onNext }) {
           </p>
         </div>
 
-        {/* Form Fields */}
         <div className="space-y-4 mb-5">
-          {/* Nama Lengkap */}
           <div>
             <label className="block text-[13px] font-bold text-gray-800 mb-1.5">
               Nama Lengkap
@@ -61,7 +55,6 @@ export default function PageLogin({ onNext }) {
             </div>
           </div>
 
-          {/* Latar Belakang Pendidikan */}
           <div>
             <label className="block text-[13px] font-bold text-gray-800 mb-1.5">
               Latar Belakang Pendidikan / Jurusan
@@ -78,7 +71,6 @@ export default function PageLogin({ onNext }) {
             </div>
           </div>
 
-          {/* Target Karier */}
           <div>
             <label className="block text-[13px] font-bold text-gray-800 mb-1.5">
               Target Karier / Pekerjaan Impian
@@ -95,7 +87,6 @@ export default function PageLogin({ onNext }) {
             </div>
           </div>
 
-          {/* Waktu Belajar Mingguan */}
           <div>
             <label className="block text-[13px] font-bold text-gray-800 mb-1.5">
               Waktu Belajar Mingguan
@@ -113,7 +104,6 @@ export default function PageLogin({ onNext }) {
           </div>
         </div>
 
-        {/* Info Box */}
         <div className="bg-[#fff9ea] border border-[#fde8af] rounded-2xl p-4 mb-5 flex items-start gap-3">
           <div className="mt-0.5">
             <Lightbulb className="w-5 h-5 text-[#f8aa18]" />
@@ -126,7 +116,6 @@ export default function PageLogin({ onNext }) {
           </div>
         </div>
 
-        {/* Submit Button */}
         <button 
           onClick={onNext}
           className="w-full py-4 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-[15px] shadow-lg shadow-green-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95"
@@ -135,7 +124,6 @@ export default function PageLogin({ onNext }) {
           Mulai Perjalananku
         </button>
 
-        {/* Secure text */}
         <div className="mt-4 flex items-center justify-center gap-1.5 text-gray-400 text-[11px] font-medium">
           <ShieldCheck className="w-3.5 h-3.5 text-[#35a95b]" />
           Data kamu tetap privat dan aman
