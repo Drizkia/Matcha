@@ -21,13 +21,13 @@ import {
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 
-export default function PageSetting({ onNavigate, onLogout }) {
+export default function PageSetting({ onNavigate, onLogout, user }) {
   // <USER PROFILE>
   const [profile, setProfile] = useState({
-    fullName: "",
-    educationalBackground: "",
-    targetCareerGoal: "",
-    weeklyStudyTime: ""
+    fullName: user?.name || "",
+    educationalBackground: user?.education || "",
+    targetCareerGoal: user?.goal || "",
+    weeklyStudyTime: user?.studyTime || ""
   });
 
   const [isSaving, setIsSaving] = useState(false);

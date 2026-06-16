@@ -17,7 +17,8 @@ import {
 import ChatBot from './ChatBot';
 import { deleteDocument } from '../services/api';
 
-export default function PageDocument({ onNavigate, onLogout }) {
+export default function PageDocument({ onNavigate, onLogout, user }) {
+  const sessionId = user?.sessionId || 'demo-session';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // <STATS & FILES>
@@ -34,7 +35,7 @@ export default function PageDocument({ onNavigate, onLogout }) {
     
     try {
       await deleteDocument({
-        session_id: 'demo-session',
+        session_id: sessionId,
         file_type: fileType
       });
       

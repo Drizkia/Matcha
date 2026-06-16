@@ -12,6 +12,28 @@ import {
 } from 'lucide-react';
 
 export default function PageLogin({ onNext }) {
+  const [formData, setFormData] = React.useState({
+    name: '',
+    education: '',
+    goal: '',
+    studyTime: ''
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) {
+      alert("Nama lengkap harus diisi!");
+      return;
+    }
+
+    const sessionId = `user-${Date.now()}`;
+    onNext({ ...formData, sessionId });
+  };
+
   return (
     <div className="min-h-screen bg-[#d2f3db] flex items-center justify-center p-4 md:p-8 font-sans">
       <div className="fixed top-[10%] left-[10%] w-48 sm:w-64 h-48 sm:h-64 bg-[#aee449] rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
@@ -38,7 +60,7 @@ export default function PageLogin({ onNext }) {
           </p>
         </div>
 
-        <div className="space-y-4 mb-5">
+        <form onSubmit={handleSubmit} className="space-y-4 mb-5">
           <div>
             <label className="block text-[13px] font-bold text-gray-800 mb-1.5">
               Nama Lengkap
@@ -49,6 +71,9 @@ export default function PageLogin({ onNext }) {
               </div>
               <input 
                 type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 placeholder="Masukkan nama lengkapmu" 
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-[13px] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8ccf32] focus:border-transparent shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all"
               />
@@ -65,6 +90,9 @@ export default function PageLogin({ onNext }) {
               </div>
               <input 
                 type="text" 
+                name="education"
+                value={formData.education}
+                onChange={handleChange}
                 placeholder="cth. Ilmu Komputer, Desain, Bisnis" 
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-[13px] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8ccf32] focus:border-transparent shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all"
               />
@@ -81,6 +109,9 @@ export default function PageLogin({ onNext }) {
               </div>
               <input 
                 type="text" 
+                name="goal"
+                value={formData.goal}
+                onChange={handleChange}
                 placeholder="cth. Product Designer, ML Engineer" 
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-[13px] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8ccf32] focus:border-transparent shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all"
               />
@@ -97,12 +128,15 @@ export default function PageLogin({ onNext }) {
               </div>
               <input 
                 type="text" 
+                name="studyTime"
+                value={formData.studyTime}
+                onChange={handleChange}
                 placeholder="cth. 5 jam per minggu" 
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-[13px] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8ccf32] focus:border-transparent shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all"
               />
             </div>
           </div>
-        </div>
+        </form>
 
         <div className="bg-[#fff9ea] border border-[#fde8af] rounded-2xl p-4 mb-5 flex items-start gap-3">
           <div className="mt-0.5">
@@ -117,7 +151,7 @@ export default function PageLogin({ onNext }) {
         </div>
 
         <button 
-          onClick={onNext}
+          onClick={handleSubmit}
           className="w-full py-4 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-[15px] shadow-lg shadow-green-500/20 transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95"
         >
           <Rocket className="w-4 h-4" />

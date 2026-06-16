@@ -21,8 +21,11 @@ export default function ChatBot() {
     setIsLoading(true);
     
     try {
+      const savedUser = localStorage.getItem('matcha_user');
+      const sessionId = savedUser ? JSON.parse(savedUser).sessionId : 'demo-session';
+
       const response = await sendChatMessage({ 
-        session_id: 'demo-session', 
+        session_id: sessionId, 
         message: message 
       });
       

@@ -10,6 +10,14 @@ import PageSetting from './page/PageSetting';
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [selectedTopic, setSelectedTopic] = useState('');
+  const [user, setUser] = useState(null);
+
+  React.useEffect(() => {
+    const savedUser = localStorage.getItem('matcha_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
 
   // Logic to navigate between pages
   const goToLogin = () => setCurrentPage('login');
@@ -21,22 +29,41 @@ export default function App() {
     setCurrentPage(page);
   };
 
+  const handleLoginSubmit = (userData) => {
+    setUser(userData);
+    localStorage.setItem('matcha_user', JSON.stringify(userData));
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('matcha_user');
+    setCurrentPage('landing');
+  };
+
+  const renderProtectedRoute = (Component, props) => {
+    if (!user) {
+      return <PageLogin onNext={handleLoginSubmit} />;
+    }
+    return <Component {...props} user={user} />;
+  };
+
   // Simple Router
   switch (currentPage) {
     case 'landing':
       return <PageLanding onNext={goToLogin} />;
     case 'login':
-      return <PageLogin onNext={goToDashboard} />;
+      return <PageLogin onNext={handleLoginSubmit} />;
     case 'dashboard':
-      return <PageDashboard onNavigate={handleNavigate} onLogout={goToLanding} />;
+      return renderProtectedRoute(PageDashboard, { onNavigate: handleNavigate, onLogout: handleLogout });
     case 'career-path':
-      return <PageCareerPath onNavigate={handleNavigate} onLogout={goToLanding} />;
+      return renderProtectedRoute(PageCareerPath, { onNavigate: handleNavigate, onLogout: handleLogout });
     case 'resource':
-      return <PageResource onNavigate={handleNavigate} onLogout={goToLanding} initialTopic={selectedTopic} />;
+      return renderProtectedRoute(PageResource, { onNavigate: handleNavigate, onLogout: handleLogout, initialTopic: selectedTopic });
     case 'document':
-      return <PageDocument onNavigate={handleNavigate} onLogout={goToLanding} />;
+      return renderProtectedRoute(PageDocument, { onNavigate: handleNavigate, onLogout: handleLogout });
     case 'setting':
-      return <PageSetting onNavigate={handleNavigate} onLogout={goToLanding} />;
+      return renderProtectedRoute(PageSetting, { onNavigate: handleNavigate, onLogout: handleLogout });
     default:
       return <PageLanding onNext={goToLogin} />;
   }
