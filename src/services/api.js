@@ -1,12 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 /** Helper: Kirim request dengan JSON body */
 async function request(endpoint, options = {}) {
-  const token = localStorage.getItem('matcha_token');
-
   const defaultHeaders = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
   };
 
   const response = await fetch(`${API_URL}${endpoint}`, {
@@ -24,11 +21,8 @@ async function request(endpoint, options = {}) {
 
 /** Helper: Kirim request dengan FormData (untuk upload file) */
 async function requestForm(endpoint, formData) {
-  const token = localStorage.getItem('matcha_token');
-
   const response = await fetch(`${API_URL}${endpoint}`, {
     method: 'POST',
-    headers: { ...(token && { Authorization: `Bearer ${token}` }) },
     body: formData,
   });
 
@@ -41,101 +35,48 @@ async function requestForm(endpoint, formData) {
 }
 
 // ============================================================
-// AUTH
+// ENDPOINTS BERDASARKAN SWAGGER UI
 // ============================================================
 
-/** POST /auth/register — Daftar user baru */
-export const register = (userData) =>
-  request('/auth/register', { method: 'POST', body: JSON.stringify(userData) });
-
-/** POST /auth/login — Login dan dapat token */
-export const login = async (credentials) => {
-  const data = await request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
-  if (data.access_token) localStorage.setItem('matcha_token', data.access_token);
-  return data;
-};
-
-/** Logout — Hapus token dari local storage */
-export const logout = () => localStorage.removeItem('matcha_token');
-
-// ============================================================
-// USER PROFILE
-// ============================================================
-
-/** GET /users/me — Ambil data profile user yang sedang login */
-export const getProfile = () =>
-  request('/users/me');
-
-/** PATCH /users/me — Update data profile user */
-export const updateProfile = (profileData) =>
-  request('/users/me', { method: 'PATCH', body: JSON.stringify(profileData) });
-
-/** POST /users/me/reset — Reset semua data user */
-export const resetAllServices = () =>
-  request('/users/me/reset', { method: 'POST' });
-
-// ============================================================
-// DOKUMEN (CV & LinkedIn)
-// ============================================================
-
-/** GET /documents — Ambil semua dokumen user */
-export const getDocuments = () =>
-  request('/documents');
-
-/**
- * POST /documents/upload — Upload CV atau LinkedIn PDF
- * @param {File} file - Object File dari input/drag-drop
- * @param {'cv' | 'linkedin'} type - Tipe dokumen
+/** 
+ * POST /chat — Chat dengan AI
+ * @param {Object} payload - Data chat (misal: { session_id: "...", message: "..." })
  */
-export const uploadDocument = (file, type) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('type', type);
-  return requestForm('/documents/upload', formData);
-};
+export const sendChatMessage = (payload) =>
+  request('/chat', { method: 'POST', body: JSON.stringify(payload) });
 
-/** DELETE /documents/{id} — Hapus dokumen */
-export const deleteDocument = (id) =>
-  request(`/documents/${id}`, { method: 'DELETE' });
-
-// ============================================================
-// AI — CAREER ANALYSIS & ROADMAP
-// ============================================================
-
-/**
- * POST /ai/analyze — Kirim job description dan trigger AI
- * AI akan membaca CV + LinkedIn + Job Desc, lalu generate roadmap
- * @param {string} jobDescription - Teks dari textarea job description
+/** 
+ * POST /upload — Upload dokumen
+ * @param {FormData} formData - Data form berisi file dan info tambahan
  */
-export const analyzeCareer = (jobDescription) =>
-  request('/ai/analyze', { method: 'POST', body: JSON.stringify({ job_description: jobDescription }) });
+export const uploadDocument = (formData) =>
+  requestForm('/upload', formData);
 
-/** GET /ai/roadmap — Ambil hasil Learning Roadmap dari AI */
-export const getRoadmap = () =>
-  request('/ai/roadmap');
-
-/** GET /ai/skills — Ambil skill gap analysis dari AI */
-export const getSkillGap = () =>
-  request('/ai/skills');
-
-// ============================================================
-// RESOURCES / KURSUS
-// ============================================================
-
-/**
- * GET /resources — Ambil daftar kursus yang direkomendasikan AI
- * @param {string} topic - (Opsional) Filter berdasarkan topik roadmap
+/** 
+ * GET /preview/{session_id}/{file_type} — Preview dokumen
+ * @param {string} sessionId - ID sesi user
+ * @param {string} fileType - Jenis file (misal: 'cv' atau 'linkedin')
  */
-export const getResources = (topic = '') =>
-  request(`/resources${topic ? `?topic=${encodeURIComponent(topic)}` : ''}`);
+export const previewDocument = (sessionId, fileType) =>
+  request(`/preview/${sessionId}/${fileType}`);
 
-// ============================================================
-// AI CHAT AGENT
-// ============================================================
-
-/**
- * POST /chat — Kirim pesan ke AI Agent
- * @param {string} message - Pesan dari user
+/** 
+ * POST /review-document — Review dokumen
+ * @param {Object} payload - Data untuk review (misal: { session_id: "...", file_type: "..." })
  */
-export const sendChatMessage = (message) =>
-  request('/chat', { method: 'POST', body: JSON.stringify({ message }) });
+export const reviewDocument = (payload) =>
+  request('/review-document', { method: 'POST', body: JSON.stringify(payload) });
+
+/** 
+ * POST /analyze-job — Analisis pekerjaan
+ * @param {Object} payload - Data analisis pekerjaan (misal: { session_id: "...", job_description: "..." })
+ */
+export const analyzeJob = (payload) =>
+  request('/analyze-job', { method: 'POST', body: JSON.stringify(payload) });
+
+/** 
+ * POST /delete-document — Hapus dokumen
+ * @param {Object} payload - Data dokumen yang akan dihapus (misal: { session_id: "...", file_type: "..." })
+ */
+export const deleteDocument = (payload) =>
+  request('/delete-document', { method: 'POST', body: JSON.stringify(payload) });
