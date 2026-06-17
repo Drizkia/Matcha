@@ -16,21 +16,57 @@ import {
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 
-export default function PageResource({ onNavigate, onLogout, initialTopic = '' }) {
+export default function PageResource({ onNavigate, onLogout, initialTopic = '', agentState, sessionId, setAgentState }) {
   // <FILTER CATEGORIES>
   const categories = ["Semua", "Coursera", "Udemy", "YouTube", "Gratis", "Rekomendasi"];
 
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // <COURSE CATALOG>
-  const coursesData = [];
+  // Baca data katalog kursus dari agentState (hasil pencarian Chroma di backend)
+  const backendCourses = agentState?.courses_catalog || [];
+
+  // Map data backend ke format UI yang diharapkan PageResource
+  const coursesData = backendCourses.map(course => {
+    // Generate colorCode based on platform
+    let colorCode = "bg-gradient-to-br from-blue-500 to-indigo-600";
+    if (course.platform === "Udemy") {
+      colorCode = "bg-gradient-to-br from-purple-500 to-pink-600";
+    } else if (course.platform === "YouTube") {
+      colorCode = "bg-gradient-to-br from-red-500 to-orange-600";
+    } else if (course.platform === "Dicoding") {
+      colorCode = "bg-gradient-to-br from-green-500 to-teal-600";
+    }
+
+    const skillsText = Array.isArray(course.skills_covered) ? course.skills_covered.join(", ") : "";
+
+    return {
+      id: course.id || Math.random().toString(),
+      platform: course.platform || "Online",
+      title: course.title || "Kursus Tanpa Judul",
+      description: skillsText ? `Keahlian yang dipelajari: ${skillsText}` : "Tingkatkan keahlianmu dengan kursus terarah ini.",
+      duration: `${course.duration_weeks || 4} minggu`,
+      level: course.level ? (course.level.charAt(0).toUpperCase() + course.level.slice(1)) : "Semua Level",
+      price: course.price || 0,
+      colorCode,
+      url: course.url || "#"
+    };
+  });
 
   const [searchQuery, setSearchQuery] = useState(initialTopic);
 
   const filteredCourses = coursesData.filter(c => {
-    const matchCategory = activeCategory === "Semua" || activeCategory === "Rekomendasi" || activeCategory === "Gratis" 
-      || c.platform === activeCategory;
+    let matchCategory = false;
+    if (activeCategory === "Semua") {
+      matchCategory = true;
+    } else if (activeCategory === "Rekomendasi") {
+      matchCategory = true; // All courses here are recommendations
+    } else if (activeCategory === "Gratis") {
+      matchCategory = c.price === 0;
+    } else {
+      matchCategory = c.platform === activeCategory;
+    }
+    
     const matchSearch = c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                         c.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
@@ -172,40 +208,63 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
            ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-           {filteredCourses.map(course => (
-             <div key={course.id} className="bg-[#fcfbfa] rounded-[2rem] overflow-hidden shadow-sm border border-white/50 flex flex-col hover:shadow-md transition-shadow group">
-                
-                <div className={`h-28 sm:h-32 ${course.colorCode} relative p-4 opacity-80 group-hover:opacity-100 transition-opacity`}>
-                   <span className="bg-white/70 backdrop-blur-md text-gray-800 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">
-                     {course.platform}
-                   </span>
-                </div>
-
-                <div className="p-5 sm:p-6 flex-1 flex flex-col bg-white">
-                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 leading-tight">
-                     {course.title}
-                   </h3>
-                   <p className="text-gray-500 text-xs leading-relaxed mb-5 flex-1">
-                     {course.description}
-                   </p>
-                   
-                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50 mb-4">
-                     <div className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold">
-                        <Clock className="w-3.5 h-3.5" /> {course.duration}
-                     </div>
-                     <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-[10px] font-bold">
-                        {course.level}
+        {filteredCourses.length === 0 ? (
+          <div className="bg-[#fcfbfa] rounded-[2rem] p-8 sm:p-12 shadow-sm border border-white/50 text-center relative z-10">
+            <div className="w-16 h-16 bg-[#e5f8ec] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+              <BookOpen className="w-8 h-8 text-[#35a95b]" />
+            </div>
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Belum Ada Rekomendasi Belajar</h3>
+            <p className="text-gray-500 text-sm mb-6 max-w-md mx-auto">
+              Unggah CV dan lakukan analisis target peran terlebih dahulu di Dashboard agar kami dapat merekomendasikan kursus terbaik dari katalog untukmu.
+            </p>
+            <button
+              onClick={() => onNavigate('dashboard')}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-green-500/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <ArrowRight className="w-4 h-4" /> Mulai Analisis di Dashboard
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 relative z-10">
+             {filteredCourses.map(course => (
+               <div key={course.id} className="bg-[#fcfbfa] rounded-[2rem] overflow-hidden shadow-sm border border-white/50 flex flex-col hover:shadow-md transition-shadow group">
+                  
+                  <div className={`h-28 sm:h-32 ${course.colorCode} relative p-4 opacity-80 group-hover:opacity-100 transition-opacity`}>
+                     <span className="bg-white/70 backdrop-blur-md text-gray-800 px-3 py-1 rounded-full text-[10px] font-bold shadow-sm inline-block">
+                       {course.platform}
                      </span>
-                   </div>
+                  </div>
 
-                   <button className="w-full py-3 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-1.5">
-                     Mulai Belajar <ArrowRight className="w-4 h-4" />
-                   </button>
-                </div>
-             </div>
-           ))}
-        </div>
+                  <div className="p-5 sm:p-6 flex-1 flex flex-col bg-white">
+                     <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
+                       {course.title}
+                     </h3>
+                     <p className="text-gray-500 text-xs leading-relaxed mb-5 flex-1 line-clamp-3">
+                       {course.description}
+                     </p>
+                     
+                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50 mb-4">
+                       <div className="flex items-center gap-1.5 text-gray-500 text-xs font-semibold">
+                          <Clock className="w-3.5 h-3.5" /> {course.duration}
+                       </div>
+                       <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-[10px] font-bold">
+                          {course.level}
+                       </span>
+                     </div>
+
+                     <a 
+                       href={course.url} 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       className="w-full py-3 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-1.5 text-center font-bold"
+                     >
+                       Mulai Belajar <ArrowRight className="w-4 h-4" />
+                     </a>
+                  </div>
+               </div>
+             ))}
+          </div>
+        )}
 
       </main>
 
@@ -219,7 +278,7 @@ export default function PageResource({ onNavigate, onLogout, initialTopic = '' }
         ))}
       </nav>
 
-      <ChatBot />
+      <ChatBot sessionId={sessionId} agentState={agentState} setAgentState={setAgentState} />
 
     </div>
   );

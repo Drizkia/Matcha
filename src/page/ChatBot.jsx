@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { MessageCircle, X, Send, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, AlertTriangle } from 'lucide-react';
 
 import { sendChatMessage } from '../services/api';
 
-export default function ChatBot() {
+export default function ChatBot({ sessionId, agentState, setAgentState }) {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([
@@ -21,13 +21,17 @@ export default function ChatBot() {
     setIsLoading(true);
     
     try {
-      const savedUser = localStorage.getItem('matcha_user');
-      const sessionId = savedUser ? JSON.parse(savedUser).sessionId : 'demo-session';
+      const sid = sessionId || 'demo-session';
 
       const response = await sendChatMessage({ 
-        session_id: sessionId, 
-        message: message 
+        session_id: sid, 
+        user_input: message,
+        agent_state: agentState
       });
+      
+      if (response.agent_state && setAgentState) {
+        setAgentState(response.agent_state);
+      }
       
       setChatHistory([...newHistory, { sender: 'bot', text: response.response || 'Saya mengerti! Saya di sini untuk membantumu mencapai tujuan kariermu.' }]);
     } catch (error) {
@@ -52,6 +56,15 @@ export default function ChatBot() {
               <X className="w-4 h-4" />
             </button>
           </div>
+
+          {agentState?.drift_detected && (
+            <div className="bg-[#fff9ea] border-b border-[#fde8af] px-3 py-2 flex items-start gap-2 text-[11px] text-[#d68f11]">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#f8aa18] mt-0.5 flex-shrink-0 animate-bounce" />
+              <div>
+                <span className="font-bold">Arah Belajar Berubah?</span> Matcha mendeteksi pergeseran minat karir. Kamu bisa menganalisis ulang target karir baru di Dashboard.
+              </div>
+            </div>
+          )}
           
           <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-gray-50">
             {chatHistory.map((chat, index) => (
@@ -59,6 +72,11 @@ export default function ChatBot() {
                 {chat.text}
               </div>
             ))}
+            {isLoading && (
+              <div className="bg-white border border-gray-100 text-gray-500 self-start rounded-bl-sm shadow-sm p-3 rounded-2xl text-sm italic">
+                Sedang mengetik...
+              </div>
+            )}
           </div>
           
           <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 flex gap-2 items-center">

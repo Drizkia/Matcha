@@ -15,31 +15,67 @@ import {
   X
 } from 'lucide-react';
 import ChatBot from './ChatBot';
-import { deleteDocument } from '../services/api';
+import { deleteDocument, uploadDocument } from '../services/api';
 
-export default function PageDocument({ onNavigate, onLogout, user }) {
-  const sessionId = user?.sessionId || 'demo-session';
+export default function PageDocument({ onNavigate, onLogout, user, sessionId, agentState, setAgentState }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState({ cv: false, linkedin: false });
 
-  // <STATS & FILES>
+  // Status upload berkas dinamis dari agentState
+  const cvUploaded = !!agentState?.cv_uploaded;
+  const linkedinUploaded = !!agentState?.linkedin_uploaded;
+  const totalFiles = (cvUploaded ? 1 : 0) + (linkedinUploaded ? 1 : 0);
+  const lastUpdated = totalFiles > 0 ? "Baru Saja" : "-";
+  const storageUsed = `${(totalFiles * 0.5).toFixed(1)} MB`;
+
   const stats = {
-    totalFiles: 0,
-    lastUpdated: "-",
-    storageUsed: "0 MB"
+    totalFiles,
+    lastUpdated,
+    storageUsed
   };
 
-  const [files, setFiles] = useState([]);
+  const handleFileUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsUploading(prev => ({ ...prev, [type]: true }));
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('session_id', sessionId);
+      formData.append('file_type', type);
+      
+      const result = await uploadDocument(formData);
+      
+      // Update global agentState
+      setAgentState({
+        ...agentState,
+        [`${type}_uploaded`]: true,
+        [`${type}_filename`]: result.filename || file.name,
+        [`${type}_text`]: result.extracted_text || '',
+      });
+
+      alert(`${type.toUpperCase()} berhasil diunggah!`);
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Gagal mengunggah dokumen.");
+    } finally {
+      setIsUploading(prev => ({ ...prev, [type]: false }));
+    }
+  };
 
   const handleDelete = async (fileId, fileType) => {
-    if (!window.confirm("Apakah kamu yakin ingin menghapus dokumen ini?")) return;
+    if (!window.confirm(`Apakah kamu yakin ingin menghapus dokumen ${fileType.toUpperCase()} ini?`)) return;
     
     try {
-      await deleteDocument({
+      const result = await deleteDocument({
         session_id: sessionId,
-        file_type: fileType
+        document_type: fileType
       });
       
-      setFiles(files.filter(f => f.id !== fileId));
+      if (result.agent_state) {
+        setAgentState(result.agent_state);
+      }
       alert("Dokumen berhasil dihapus.");
     } catch (error) {
       console.error("Delete error:", error);
@@ -157,26 +193,76 @@ export default function PageDocument({ onNavigate, onLogout, user }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
-           {files.map(file => (
-             <div key={file.id} className="bg-[#fcfbfa] rounded-[2rem] p-6 sm:p-8 shadow-sm border-2 border-dashed border-[#8ccf32] flex flex-col items-center text-center hover:bg-white transition-colors group">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-2xl flex items-center justify-center shadow-md mb-5 group-hover:scale-105 transition-transform duration-300">
-                  <File className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">{file.name}</h3>
-                <p className="text-gray-400 text-xs mb-1">{file.size}</p>
-                <p className="text-gray-400 text-xs mb-6 sm:mb-8">Diunggah {file.uploadedAt}</p>
-                
-                <div className="flex gap-3 w-full mt-auto">
-                  <button className="flex-1 flex items-center justify-center gap-1.5 bg-[#e4f7eb] text-[#35a95b] hover:bg-[#d1f0dc] px-4 py-2.5 rounded-xl font-bold text-xs transition-colors border border-green-100">
-                     <RefreshCw className="w-3.5 h-3.5" /> Perbarui
-                  </button>
-                  <button onClick={() => handleDelete(file.id, file.type)} className="flex-1 flex items-center justify-center gap-1.5 bg-[#ffebee] text-[#e53935] hover:bg-[#ffcdd2] px-4 py-2.5 rounded-xl font-bold text-xs transition-colors border border-red-100">
-                     <Trash2 className="w-3.5 h-3.5" /> Hapus
-                  </button>
-                </div>
-             </div>
-           ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8 relative z-10">
+           {/* Box CV */}
+           <div className={`bg-[#fcfbfa] rounded-[2rem] p-6 sm:p-8 shadow-sm border-2 flex flex-col items-center text-center transition-colors group ${
+             cvUploaded ? 'border-[#35a95b]' : 'border-dashed border-[#8ccf32] hover:bg-white'
+           }`}>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-2xl flex items-center justify-center shadow-md mb-5 group-hover:scale-105 transition-transform duration-300">
+                <File className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">Curriculum Vitae (CV)</h3>
+              
+              {cvUploaded ? (
+                <>
+                  <p className="text-[#35a95b] text-xs font-bold mb-2 truncate max-w-full px-4">Terunggah: {agentState?.cv_filename}</p>
+                  <p className="text-gray-400 text-xs mb-6">PDF / DOCX (Tersimpan di Sesi)</p>
+                  
+                  <div className="flex gap-3 w-full mt-auto">
+                    <label className="flex-1 flex items-center justify-center gap-1.5 bg-[#e4f7eb] text-[#35a95b] hover:bg-[#d1f0dc] px-4 py-2.5 rounded-xl font-bold text-xs cursor-pointer transition-colors border border-green-100">
+                       <input type="file" accept=".pdf,.docx" className="hidden" onChange={(e) => handleFileUpload(e, 'cv')} />
+                       {isUploading.cv ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Perbarui
+                    </label>
+                    <button onClick={() => handleDelete('cv', 'cv')} className="flex-1 flex items-center justify-center gap-1.5 bg-[#ffebee] text-[#e53935] hover:bg-[#ffcdd2] px-4 py-2.5 rounded-xl font-bold text-xs transition-colors border border-red-100">
+                       <Trash2 className="w-3.5 h-3.5" /> Hapus
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-xs mb-6">Belum ada CV yang diunggah.</p>
+                  <label className="w-full mt-auto py-3 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-sm shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95 transition-all">
+                     <input type="file" accept=".pdf,.docx" className="hidden" onChange={(e) => handleFileUpload(e, 'cv')} />
+                     {isUploading.cv ? <RefreshCw className="w-4 h-4 animate-spin" /> : <File className="w-4 h-4" />} Unggah CV
+                  </label>
+                </>
+              )}
+           </div>
+
+           {/* Box LinkedIn */}
+           <div className={`bg-[#fcfbfa] rounded-[2rem] p-6 sm:p-8 shadow-sm border-2 flex flex-col items-center text-center transition-colors group ${
+             linkedinUploaded ? 'border-blue-500' : 'border-dashed border-[#8ccf32] hover:bg-white'
+           }`}>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-2xl flex items-center justify-center shadow-md mb-5 group-hover:scale-105 transition-transform duration-300">
+                <File className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1">LinkedIn Profile PDF</h3>
+              
+              {linkedinUploaded ? (
+                <>
+                  <p className="text-blue-600 text-xs font-bold mb-2 truncate max-w-full px-4">Terunggah: {agentState?.linkedin_filename}</p>
+                  <p className="text-gray-400 text-xs mb-6">PDF (Tersimpan di Sesi)</p>
+                  
+                  <div className="flex gap-3 w-full mt-auto">
+                    <label className="flex-1 flex items-center justify-center gap-1.5 bg-[#e4f7eb] text-[#35a95b] hover:bg-[#d1f0dc] px-4 py-2.5 rounded-xl font-bold text-xs cursor-pointer transition-colors border border-green-100">
+                       <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileUpload(e, 'linkedin')} />
+                       {isUploading.linkedin ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Perbarui
+                    </label>
+                    <button onClick={() => handleDelete('linkedin', 'linkedin')} className="flex-1 flex items-center justify-center gap-1.5 bg-[#ffebee] text-[#e53935] hover:bg-[#ffcdd2] px-4 py-2.5 rounded-xl font-bold text-xs transition-colors border border-red-100">
+                       <Trash2 className="w-3.5 h-3.5" /> Hapus
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-400 text-xs mb-6">Belum ada profil LinkedIn yang diunggah.</p>
+                  <label className="w-full mt-auto py-3 bg-gradient-to-r from-[#3fb067] to-[#8ccf32] hover:from-[#35a95b] hover:to-[#7dc325] text-white rounded-xl font-bold text-sm shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95 transition-all">
+                     <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileUpload(e, 'linkedin')} />
+                     {isUploading.linkedin ? <RefreshCw className="w-4 h-4 animate-spin" /> : <File className="w-4 h-4" />} Unggah LinkedIn
+                  </label>
+                </>
+              )}
+           </div>
         </div>
 
       </main>
@@ -191,7 +277,7 @@ export default function PageDocument({ onNavigate, onLogout, user }) {
         ))}
       </nav>
 
-      <ChatBot />
+      <ChatBot sessionId={sessionId} agentState={agentState} setAgentState={setAgentState} />
 
     </div>
   );

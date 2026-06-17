@@ -16,20 +16,29 @@ import {
   Target,
   Menu,
   X,
-  RefreshCw
+  RefreshCw,
+  CheckCircle2
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 import { uploadDocument, analyzeJob } from '../services/api';
 
-export default function PageDashboard({ onNavigate, onLogout }) {
-  const [userName, setUserName] = useState("John Doe");
+export default function PageDashboard({ onNavigate, onLogout, sessionId, agentState, setAgentState }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const [cvFile, setCvFile] = useState(null);
   const [linkedinFile, setLinkedinFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const sessionId = "demo-session";
+  const [isUploading, setIsUploading] = useState({ cv: false, linkedin: false });
+
+  // Ambil nama user dari localStorage (yang disimpan saat login)
+  const savedUser = localStorage.getItem('matcha_user');
+  const userName = savedUser ? JSON.parse(savedUser).name || "Pengguna" : "Pengguna";
+
+  // Status upload dari agentState
+  const cvUploaded = agentState?.cv_uploaded || cvFile;
+  const linkedinUploaded = agentState?.linkedin_uploaded || linkedinFile;
+  const hasAnalysis = !!agentState?.ats_analysis;
 
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
@@ -38,17 +47,31 @@ export default function PageDashboard({ onNavigate, onLogout }) {
     if (type === 'cv') setCvFile(file);
     else setLinkedinFile(file);
 
+    setIsUploading(prev => ({ ...prev, [type]: true }));
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('session_id', sessionId);
       formData.append('file_type', type);
       
-      await uploadDocument(formData);
+      const result = await uploadDocument(formData);
+      
+      // Update shared state dengan info upload
+      setAgentState({
+        ...agentState,
+        [`${type}_uploaded`]: true,
+        [`${type}_filename`]: result.filename || file.name,
+        [`${type}_text`]: result.extracted_text || '',
+      });
+
       alert(`${type.toUpperCase()} berhasil diunggah!`);
     } catch (error) {
       console.error("Upload error:", error);
       alert("Gagal mengunggah dokumen.");
+      if (type === 'cv') setCvFile(null);
+      else setLinkedinFile(null);
+    } finally {
+      setIsUploading(prev => ({ ...prev, [type]: false }));
     }
   };
 
@@ -57,15 +80,26 @@ export default function PageDashboard({ onNavigate, onLogout }) {
     
     setIsAnalyzing(true);
     try {
-      await analyzeJob({
+      const result = await analyzeJob({
         session_id: sessionId,
-        job_description: jobDescription
+        job_description: jobDescription,
+        agent_state: agentState,
       });
-      alert("Analisis berhasil, jalur kariermu sedang dibuat!");
-      onNavigate('career-path');
+      
+      // Simpan seluruh response ke shared state
+      if (result.agent_state) {
+        setAgentState(result.agent_state);
+      }
+      
+      if (result.agent_state?.ats_analysis) {
+        alert("Analisis berhasil! Lihat hasil di Jalur Karier.");
+        onNavigate('career-path');
+      } else {
+        alert(result.response || "Gagal melakukan analisis. Silakan lengkapi profil Anda.");
+      }
     } catch (error) {
       console.error("Analyze error:", error);
-      alert("Terjadi kesalahan saat analisis.");
+      alert("Terjadi kesalahan saat analisis. Coba lagi.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -169,6 +203,30 @@ export default function PageDashboard({ onNavigate, onLogout }) {
           <p className="text-gray-500 text-sm">Unggah dokumenmu dan tentukan target peran untuk memulai perjalanan kariermu.</p>
         </div>
 
+        {/* Status Badges */}
+        {(cvUploaded || linkedinUploaded || hasAnalysis) && (
+          <div className="relative z-10 flex flex-wrap gap-2 mb-5">
+            {cvUploaded && (
+              <div className="flex items-center gap-1.5 bg-[#e5f8ec] text-[#35a95b] px-3 py-1.5 rounded-full text-[11px] font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5" /> CV Terunggah
+              </div>
+            )}
+            {linkedinUploaded && (
+              <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-[11px] font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5" /> LinkedIn Terunggah
+              </div>
+            )}
+            {hasAnalysis && (
+              <button 
+                onClick={() => onNavigate('career-path')}
+                className="flex items-center gap-1.5 bg-[#fff9ea] text-[#d68f11] border border-[#fde8af] px-3 py-1.5 rounded-full text-[11px] font-bold hover:bg-[#fde8af]/30 transition"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Lihat Hasil Analisis →
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="relative z-10 flex flex-col lg:flex-row gap-5">
           <div className="flex-1 space-y-5">
             <div className="bg-[#fcfbfa] rounded-[2rem] p-5 shadow-sm border border-white/50">
@@ -178,15 +236,23 @@ export default function PageDashboard({ onNavigate, onLogout }) {
                   <FileText className="w-3 h-3" /> PDF
                 </span>
               </div>
-              <label className="border-2 border-dashed border-[#8ccf32] bg-white rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-green-50 transition-colors">
-                <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileUpload(e, 'cv')} />
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-xl flex items-center justify-center shadow-md mb-4">
-                  <File className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                </div>
+              <label className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
+                cvUploaded ? 'border-[#35a95b] bg-[#f0faf3]' : 'border-[#8ccf32] bg-white hover:bg-green-50'
+              }`}>
+                <input type="file" accept=".pdf,.docx" className="hidden" onChange={(e) => handleFileUpload(e, 'cv')} />
+                {isUploading.cv ? (
+                  <RefreshCw className="w-8 h-8 text-[#35a95b] animate-spin mb-3" />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-xl flex items-center justify-center shadow-md mb-4">
+                    {cvUploaded ? <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <File className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
+                  </div>
+                )}
                 <p className="font-bold text-gray-800 text-[14px] sm:text-[15px] mb-1">
-                  {cvFile ? cvFile.name : "Seret & lepas atau klik untuk memilih"}
+                  {cvFile ? cvFile.name : agentState?.cv_filename || "Seret & lepas atau klik untuk memilih"}
                 </p>
-                <p className="text-gray-400 text-xs px-4">Unggah resume terbaru untuk dianalisis AI.</p>
+                <p className="text-gray-400 text-xs px-4">
+                  {cvUploaded ? 'CV berhasil diunggah. Klik untuk mengganti.' : 'Unggah resume terbaru untuk dianalisis AI.'}
+                </p>
               </label>
             </div>
 
@@ -197,15 +263,23 @@ export default function PageDashboard({ onNavigate, onLogout }) {
                   <Target className="w-3 h-3" /> PDF
                 </span>
               </div>
-              <label className="border-2 border-dashed border-[#8ccf32] bg-white rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-green-50 transition-colors">
+              <label className={`border-2 border-dashed rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors ${
+                linkedinUploaded ? 'border-blue-400 bg-blue-50/30' : 'border-[#8ccf32] bg-white hover:bg-green-50'
+              }`}>
                 <input type="file" accept=".pdf" className="hidden" onChange={(e) => handleFileUpload(e, 'linkedin')} />
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-xl flex items-center justify-center shadow-md mb-4">
-                  <UploadCloud className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                </div>
+                {isUploading.linkedin ? (
+                  <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#8ccf32] to-[#6fb324] rounded-xl flex items-center justify-center shadow-md mb-4">
+                    {linkedinUploaded ? <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <UploadCloud className="w-5 h-5 sm:w-6 sm:h-6 text-white" />}
+                  </div>
+                )}
                 <p className="font-bold text-gray-800 text-[14px] sm:text-[15px] mb-1">
-                  {linkedinFile ? linkedinFile.name : "Seret & lepas atau klik untuk memilih"}
+                  {linkedinFile ? linkedinFile.name : agentState?.linkedin_filename || "Seret & lepas atau klik untuk memilih"}
                 </p>
-                <p className="text-gray-400 text-xs px-4">Tambahkan ekspor LinkedIn untuk melengkapi profilmu.</p>
+                <p className="text-gray-400 text-xs px-4">
+                  {linkedinUploaded ? 'LinkedIn berhasil diunggah. Klik untuk mengganti.' : 'Tambahkan ekspor LinkedIn untuk melengkapi profilmu.'}
+                </p>
               </label>
             </div>
 
@@ -281,7 +355,7 @@ export default function PageDashboard({ onNavigate, onLogout }) {
         ))}
       </nav>
 
-      <ChatBot />
+      <ChatBot sessionId={sessionId} agentState={agentState} setAgentState={setAgentState} />
 
     </div>
   );

@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 /** Helper: Kirim request dengan JSON body */
 async function request(endpoint, options = {}) {
@@ -78,3 +78,10 @@ export const analyzeJob = (payload) =>
  */
 export const deleteDocument = (payload) =>
   request('/delete-document', { method: 'POST', body: JSON.stringify(payload) });
+
+/** 
+ * GET /session/{session_id} — Ambil data sesi
+ * @param {string} sessionId - ID Sesi
+ */
+export const getSessionState = (sessionId) =>
+  request(`/session/${sessionId}`);

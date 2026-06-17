@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import ChatBot from './ChatBot';
 
-export default function PageSetting({ onNavigate, onLogout, user }) {
+export default function PageSetting({ onNavigate, onLogout, user, onUpdateUser, sessionId, agentState, setAgentState }) {
   // <USER PROFILE>
   const [profile, setProfile] = useState({
     fullName: user?.name || "",
@@ -45,6 +45,14 @@ export default function PageSetting({ onNavigate, onLogout, user }) {
     setTimeout(() => {
       setIsSaving(false);
       setSaved(true);
+      if (onUpdateUser) {
+        onUpdateUser({
+          name: profile.fullName,
+          education: profile.educationalBackground,
+          goal: profile.targetCareerGoal,
+          studyTime: profile.weeklyStudyTime
+        });
+      }
     }, 1000);
   };
 
@@ -266,7 +274,7 @@ export default function PageSetting({ onNavigate, onLogout, user }) {
         ))}
       </nav>
 
-      <ChatBot />
+      <ChatBot sessionId={sessionId} agentState={agentState} setAgentState={setAgentState} />
     </div>
   );
 }
