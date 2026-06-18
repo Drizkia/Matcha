@@ -184,12 +184,13 @@ export default function PageCareerPath({ onNavigate, onLogout, sessionId, agentS
         ) : (
           <>
             {/* ATS Match Rate Card */}
-            <div className="bg-[#fcfbfa] rounded-[2rem] p-5 sm:p-6 shadow-sm border border-white/50 mb-6 flex flex-col sm:flex-row items-center gap-5">
+            <div className="bg-[#fcfbfa] rounded-[2rem] p-5 sm:p-6 shadow-sm border border-white/50 mb-6 flex flex-col sm:flex-row items-center gap-6">
               
-              <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center flex-shrink-0">
+              {/* Lingkaran lebih besar */}
+              <div className="relative w-40 h-40 sm:w-44 sm:h-44 flex items-center justify-center flex-shrink-0">
                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                   <circle cx="60" cy="60" r="50" fill="transparent" stroke="#e5f8ec" strokeWidth="10" />
-                   <circle cx="60" cy="60" r="50" fill="transparent" stroke="#35a95b" strokeWidth="10"
+                   <circle cx="60" cy="60" r="50" fill="transparent" stroke="#e5f8ec" strokeWidth="9" />
+                   <circle cx="60" cy="60" r="50" fill="transparent" stroke="#35a95b" strokeWidth="9"
                      strokeLinecap="round"
                      strokeDasharray={`${2 * Math.PI * 50}`}
                      strokeDashoffset={`${2 * Math.PI * 50 * (1 - atsMatchRate / 100)}`}
@@ -197,20 +198,26 @@ export default function PageCareerPath({ onNavigate, onLogout, sessionId, agentS
                    />
                  </svg>
                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                   <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-none">{atsMatchRate}%</h2>
-                   <p className="text-[9px] font-bold tracking-widest text-[#35a95b] uppercase mt-1">Tingkat<br/>Kecocokan ATS</p>
+                   <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-none">{atsMatchRate}%</h2>
                  </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-                 <div className="bg-[#e4f7eb] px-4 py-2.5 rounded-full flex items-center gap-2 border border-white shadow-sm">
+              {/* Label & info di samping lingkaran */}
+              <div className="flex flex-col gap-3">
+                 <div>
+                   <p className="text-[11px] font-bold tracking-widest text-[#35a95b] uppercase">Tingkat Kecocokan ATS</p>
+                   <p className="text-sm font-semibold text-gray-600 mt-0.5">
+                     {atsMatchRate >= 70 ? 'Profilmu sangat cocok!' : atsMatchRate >= 40 ? 'Cocok dengan catatan' : 'Perlu banyak peningkatan'}
+                   </p>
+                 </div>
+                 <div className="bg-[#e4f7eb] px-4 py-2.5 rounded-full flex items-center gap-2 border border-white shadow-sm w-fit">
                     <Gauge className="w-4 h-4 text-[#35a95b]" />
                     <span className="text-gray-800 font-bold text-xs">
                       {atsMatchRate >= 70 ? 'Kecocokan Tinggi' : atsMatchRate >= 40 ? 'Kecocokan Sedang' : 'Perlu Peningkatan'}
                     </span>
                  </div>
                  {roadmapPhases.length > 0 && (
-                   <div className="bg-[#e4f7eb] px-4 py-2.5 rounded-full flex items-center gap-2 border border-white shadow-sm">
+                   <div className="bg-[#e4f7eb] px-4 py-2.5 rounded-full flex items-center gap-2 border border-white shadow-sm w-fit">
                       <Clock className="w-4 h-4 text-[#35a95b]" />
                       <span className="text-gray-800 font-bold text-xs">{learningRoadmap?.total_weeks || roadmapPhases.length * 4} Minggu Roadmap</span>
                    </div>
@@ -299,79 +306,97 @@ export default function PageCareerPath({ onNavigate, onLogout, sessionId, agentS
                ) : (
                  <div className="relative pl-6 space-y-5 before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-[#35a95b] before:via-[#35a95b]/50 before:to-transparent">
                    
-                   {roadmapPhases.map((phase, index) => {
-                     const phaseName = phase.phase_name || phase.name || phase.title || `Fase ${index + 1}`;
-                     const duration = phase.duration || phase.weeks || '';
-                     const topics = phase.topics || phase.skills || phase.focus_areas || [];
-                     const resources = phase.resources || phase.courses || [];
-                     const isCompleted = phase.completed || false;
+                    {roadmapPhases.map((phase, index) => {
+                      const phaseName = phase.phase_name || phase.name || phase.title || `Fase ${index + 1}`;
+                      const duration = phase.duration || phase.weeks || '';
+                      const topics = phase.topics || phase.skills || phase.focus_areas || [];
+                      const resources = phase.resources || phase.courses || [];
+                      const isCompleted = phase.completed || false;
 
-                     return (
-                       <div key={index} className="relative flex items-start group">
-                         <button
-                           onClick={() => togglePhaseCompletion(index)}
-                           className={`absolute left-0 -ml-[25px] w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 z-10 ${
-                             isCompleted 
-                               ? 'bg-[#35a95b] text-white' 
-                               : 'bg-white border-gray-300 text-gray-300 hover:border-[#35a95b] hover:text-[#35a95b]'
-                           }`}
-                           title={isCompleted ? "Tandai belum selesai" : "Tandai selesai"}
-                         >
-                           <CheckCircle2 className="w-3.5 h-3.5" />
-                         </button>
+                      // Topic keyword untuk navigasi ke PageResource
+                      const topicKeyword = (() => {
+                        if (topics.length > 0) {
+                          const firstTopic = topics[0];
+                          return typeof firstTopic === 'string' ? firstTopic : (firstTopic.name || firstTopic.title || phaseName);
+                        }
+                        return phaseName;
+                      })();
 
-                         <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm w-full hover:shadow-md transition-shadow group-hover:-translate-y-0.5 duration-200">
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-bold text-gray-900 text-[13px]">{phaseName}</h4>
-                                {duration && (
-                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#e4f7eb] text-[#35a95b] flex items-center gap-1">
-                                    <Clock className="w-2.5 h-2.5" /> {duration}
-                                  </span>
-                                )}
-                              </div>
-                              <span className="text-[10px] font-bold text-gray-400">Fase {index + 1}/{roadmapPhases.length}</span>
-                            </div>
+                      return (
+                        <div key={index} className="relative flex items-start group">
+                          <button
+                            onClick={() => togglePhaseCompletion(index)}
+                            className={`absolute left-0 -ml-[25px] w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 z-10 ${
+                              isCompleted 
+                                ? 'bg-[#35a95b] text-white' 
+                                : 'bg-white border-gray-300 text-gray-300 hover:border-[#35a95b] hover:text-[#35a95b]'
+                            }`}
+                            title={isCompleted ? "Tandai belum selesai" : "Tandai selesai"}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          </button>
 
-                            {/* Topics / Skills */}
-                            {topics.length > 0 && (
-                              <div className="flex flex-wrap gap-1.5 mb-2">
-                                {(Array.isArray(topics) ? topics : [topics]).map((topic, tIdx) => (
-                                  <span key={tIdx} className="bg-gray-50 text-gray-600 text-[10px] font-semibold px-2 py-0.5 rounded-md">
-                                    {typeof topic === 'string' ? topic : topic.name || topic.title || ''}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
+                          {/* Card fase — klik untuk ke PageResource dengan topik sesuai fase */}
+                          <div
+                            onClick={() => onNavigate('resource', topicKeyword)}
+                            className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm w-full hover:shadow-md hover:border-[#35a95b]/30 transition-all cursor-pointer group-hover:-translate-y-0.5 duration-200"
+                          >
+                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                               <div className="flex items-center gap-2 flex-wrap">
+                                 <h4 className="font-bold text-gray-900 text-[13px]">{phaseName}</h4>
+                                 {duration && (
+                                   <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase bg-[#e4f7eb] text-[#35a95b] flex items-center gap-1">
+                                     <Clock className="w-2.5 h-2.5" /> {duration}
+                                   </span>
+                                 )}
+                               </div>
+                               <div className="flex items-center gap-2">
+                                 <span className="text-[10px] font-bold text-gray-400">Fase {index + 1}/{roadmapPhases.length}</span>
+                                 <span className="text-[9px] font-bold text-[#35a95b] bg-[#e5f8ec] px-2 py-0.5 rounded-full flex items-center gap-1">
+                                   <ArrowRight className="w-2.5 h-2.5" /> Lihat Materi
+                                 </span>
+                               </div>
+                             </div>
 
-                            {/* Resources / Courses */}
-                            {resources.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-gray-50">
-                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Rekomendasi:</p>
-                                <div className="space-y-1">
-                                  {resources.slice(0, 3).map((res, rIdx) => {
-                                    const resTitle = typeof res === 'string' ? res : (res.title || res.name || res.course_name || '');
-                                    const resUrl = typeof res === 'object' ? (res.url || res.link || '') : '';
-                                    return (
-                                      <div key={rIdx} className="flex items-center gap-1.5">
-                                        <CheckCircle2 className="w-3 h-3 text-[#35a95b] flex-shrink-0" />
-                                        {resUrl ? (
-                                          <a href={resUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] text-blue-600 hover:underline truncate">
-                                            {resTitle}
-                                          </a>
-                                        ) : (
-                                          <span className="text-[11px] text-gray-600 truncate">{resTitle}</span>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                         </div>
-                       </div>
-                     );
-                   })}
+                             {/* Topics / Skills */}
+                             {topics.length > 0 && (
+                               <div className="flex flex-wrap gap-1.5 mb-2">
+                                 {(Array.isArray(topics) ? topics : [topics]).map((topic, tIdx) => (
+                                   <span key={tIdx} className="bg-gray-50 text-gray-600 text-[10px] font-semibold px-2 py-0.5 rounded-md">
+                                     {typeof topic === 'string' ? topic : topic.name || topic.title || ''}
+                                   </span>
+                                 ))}
+                               </div>
+                             )}
+
+                             {/* Resources / Courses */}
+                             {resources.length > 0 && (
+                               <div className="mt-2 pt-2 border-t border-gray-50">
+                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Rekomendasi:</p>
+                                 <div className="space-y-1">
+                                   {resources.slice(0, 3).map((res, rIdx) => {
+                                     const resTitle = typeof res === 'string' ? res : (res.title || res.name || res.course_name || '');
+                                     const resUrl = typeof res === 'object' ? (res.url || res.link || '') : '';
+                                     return (
+                                       <div key={rIdx} className="flex items-center gap-1.5" onClick={e => e.stopPropagation()}>
+                                         <CheckCircle2 className="w-3 h-3 text-[#35a95b] flex-shrink-0" />
+                                         {resUrl ? (
+                                           <a href={resUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] text-blue-600 hover:underline truncate">
+                                             {resTitle}
+                                           </a>
+                                         ) : (
+                                           <span className="text-[11px] text-gray-600 truncate">{resTitle}</span>
+                                         )}
+                                       </div>
+                                     );
+                                   })}
+                                 </div>
+                               </div>
+                             )}
+                          </div>
+                        </div>
+                      );
+                    })}
                  </div>
                )}
             </div>
